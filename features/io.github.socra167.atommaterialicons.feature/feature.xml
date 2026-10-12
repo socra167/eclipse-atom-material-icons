@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="io.github.socra167.atommaterialicons.feature"
+      label="%featureName"
+      version="1.0.0.qualifier"
+      provider-name="%providerName">
+
+   <description url="https://github.com/socra167/eclipse-atom-material-icons">
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="https://opensource.org/licenses/MIT">
+      %license
+   </license>
+
+   <plugin
+         id="io.github.socra167.atommaterialicons"
+         version="0.0.0"/>
+
+</feature>
