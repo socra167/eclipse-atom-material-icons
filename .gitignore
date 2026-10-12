@@ -1,0 +1,19 @@
+# Maven / Tycho
+target/
+.tycho-consumer-pom.xml
+.polyglot.*
+
+# Eclipse
+.metadata/
+bin/
+.settings/
+*.launch
+
+# Node (icon generator)
+node_modules/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+*.iml
