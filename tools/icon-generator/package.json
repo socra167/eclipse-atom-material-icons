@@ -1,0 +1,14 @@
+{
+  "name": "atom-material-icons-eclipse-generator",
+  "private": true,
+  "description": "Converts the Atom Material Icons SVG assets and associations into the PNG icons and XML used by the Eclipse plug-in.",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "generate": "node generate.mjs"
+  },
+  "dependencies": {
+    "@resvg/resvg-js": "2.6.2",
+    "fast-xml-parser": "5.11.2"
+  }
+}
