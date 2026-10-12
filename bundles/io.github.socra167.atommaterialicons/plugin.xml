@@ -1,4 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="io.github.socra167.atommaterialicons.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+
+   <!--
+      A label-only navigator content. Its "highest" priority makes the Common Navigator ask its
+      label provider for images before the resource and Java contents; elements it has no icon
+      for fall through to them. It never contributes children.
+   -->
+   <extension
+         point="org.eclipse.ui.navigator.navigatorContent">
+      <navigatorContent
+            id="io.github.socra167.atommaterialicons.navigatorContent"
+            name="%navigatorContent.name"
+            icon="icons/folders/folder.png"
+            priority="highest"
+            activeByDefault="true"
+            contentProvider="io.github.socra167.atommaterialicons.navigator.NoContentProvider"
+            labelProvider="io.github.socra167.atommaterialicons.navigator.MaterialIconLabelProvider">
+         <triggerPoints>
+            <instanceof
+                  value="java.lang.Void">
+            </instanceof>
+         </triggerPoints>
+         <possibleChildren>
+            <or>
+               <instanceof
+                     value="org.eclipse.core.resources.IResource">
+               </instanceof>
+               <adapt
+                     type="org.eclipse.core.resources.IResource">
+               </adapt>
+            </or>
+         </possibleChildren>
+      </navigatorContent>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.navigator.viewer">
+      <viewerContentBinding
+            viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+         <includes>
+            <contentExtension
+                  pattern="io.github.socra167.atommaterialicons.navigatorContent">
+            </contentExtension>
+         </includes>
+      </viewerContentBinding>
+   </extension>
 </plugin>
