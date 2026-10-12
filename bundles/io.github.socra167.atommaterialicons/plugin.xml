@@ -8,6 +8,27 @@
       </initializer>
    </extension>
 
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            id="io.github.socra167.atommaterialicons.preferencePage"
+            category="org.eclipse.ui.preferencePages.Views"
+            class="io.github.socra167.atommaterialicons.preferences.MaterialIconsPreferencePage"
+            name="%preferencePage.name">
+         <keywordReference
+               id="io.github.socra167.atommaterialicons.keywords">
+         </keywordReference>
+      </page>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.keywords">
+      <keyword
+            id="io.github.socra167.atommaterialicons.keywords"
+            label="%preferencePage.keywords">
+      </keyword>
+   </extension>
+
    <!--
       A label-only navigator content. Its "highest" priority makes the Common Navigator ask its
       label provider for images before the resource and Java contents; elements it has no icon
