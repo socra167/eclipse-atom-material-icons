@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Atom Material Icons Tests
+Bundle-Vendor: socra167
+Bundle-SymbolicName: io.github.socra167.atommaterialicons.tests
+Bundle-Version: 1.0.0.qualifier
+Fragment-Host: io.github.socra167.atommaterialicons
+Bundle-RequiredExecutionEnvironment: JavaSE-17
+Import-Package: org.junit.jupiter.api;version="[5.0.0,6.0.0)"
+Automatic-Module-Name: io.github.socra167.atommaterialicons.tests

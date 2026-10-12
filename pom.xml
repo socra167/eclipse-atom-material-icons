@@ -19,6 +19,7 @@
 
   <modules>
     <module>bundles/io.github.socra167.atommaterialicons</module>
+    <module>tests/io.github.socra167.atommaterialicons.tests</module>
     <module>features/io.github.socra167.atommaterialicons.feature</module>
     <module>releng/io.github.socra167.atommaterialicons.site</module>
   </modules>
