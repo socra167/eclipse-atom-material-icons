@@ -111,8 +111,8 @@ public class MaterialIconLabelProvider extends LabelProvider
 		}
 
 		ImageDescriptor descriptor = activator.getImageDescriptor(icon);
-		if (current.problemOverlays) {
-			descriptor = addProblemOverlay(descriptor, resource);
+		if (current.errorOverlays || current.warningOverlays) {
+			descriptor = addProblemOverlay(descriptor, resource, current.errorOverlays, current.warningOverlays);
 		}
 		return getResources().create(descriptor);
 	}
@@ -140,30 +140,45 @@ public class MaterialIconLabelProvider extends LabelProvider
 		return resource.getFullPath().toString();
 	}
 
-	private static ImageDescriptor addProblemOverlay(ImageDescriptor descriptor, IResource resource) {
+	/**
+	 * Adds the overlay of the most severe problem whose overlay is enabled. When only warnings are
+	 * shown, a resource with errors and warnings still gets the warning overlay.
+	 */
+	private static ImageDescriptor addProblemOverlay(ImageDescriptor descriptor, IResource resource, boolean errors,
+			boolean warnings) {
 		if (!resource.isAccessible()) {
 			return descriptor;
 		}
-		String overlay;
+		String overlay = null;
 		try {
 			int depth = resource.getType() == IResource.FILE ? IResource.DEPTH_ZERO : IResource.DEPTH_INFINITE;
-			switch (resource.findMaxProblemSeverity(IMarker.PROBLEM, true, depth)) {
-			case IMarker.SEVERITY_ERROR:
+			int severity = resource.findMaxProblemSeverity(IMarker.PROBLEM, true, depth);
+			if (severity == IMarker.SEVERITY_ERROR && errors) {
 				overlay = ISharedImages.IMG_DEC_FIELD_ERROR;
-				break;
-			case IMarker.SEVERITY_WARNING:
+			} else if (warnings && (severity == IMarker.SEVERITY_WARNING
+					|| (severity == IMarker.SEVERITY_ERROR && hasWarnings(resource, depth)))) {
 				overlay = ISharedImages.IMG_DEC_FIELD_WARNING;
-				break;
-			default:
-				return descriptor;
 			}
 		} catch (CoreException e) {
 			// markers may change concurrently, show the plain icon
 			return descriptor;
 		}
+		if (overlay == null) {
+			return descriptor;
+		}
 		ImageDescriptor overlayDescriptor = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(overlay);
 		return new ProblemOverlayIcon(descriptor, overlayDescriptor);
 	}
+
+	private static boolean hasWarnings(IResource resource, int depth) throws CoreException {
+		for (IMarker marker : resource.findMarkers(IMarker.PROBLEM, true, depth)) {
+			if (marker.getAttribute(IMarker.SEVERITY, -1) == IMarker.SEVERITY_WARNING) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 
 	private LocalResourceManager getResources() {
 		if (resources == null) {
@@ -204,7 +219,7 @@ public class MaterialIconLabelProvider extends LabelProvider
 	public void resourceChanged(IResourceChangeEvent event) {
 		Settings current = settings;
 		Set<IResource> changed = new LinkedHashSet<>();
-		if (current.problemOverlays) {
+		if (current.errorOverlays || current.warningOverlays) {
 			for (IMarkerDelta delta : event.findMarkerDeltas(IMarker.PROBLEM, true)) {
 				// the severity of folders aggregates their content, so update the ancestors too
 				for (IResource r = delta.getResource(); r != null && r.getType() != IResource.ROOT; r = r.getParent()) {
@@ -282,7 +297,7 @@ public class MaterialIconLabelProvider extends LabelProvider
 	 * Snapshot of the preferences, so that they are not looked up for every label.
 	 */
 	private record Settings(boolean fileIcons, boolean folderIcons, boolean defaultFolderIcon,
-			boolean modelElementFolders, boolean problemOverlays, boolean javaTypeIcons) {
+			boolean modelElementFolders, boolean errorOverlays, boolean warningOverlays, boolean javaTypeIcons) {
 
 		static Settings load() {
 			return new Settings(
@@ -290,7 +305,8 @@ public class MaterialIconLabelProvider extends LabelProvider
 					PreferenceConstants.getBoolean(PreferenceConstants.FOLDER_ICONS),
 					PreferenceConstants.getBoolean(PreferenceConstants.DEFAULT_FOLDER_ICON),
 					PreferenceConstants.getBoolean(PreferenceConstants.MODEL_ELEMENT_FOLDERS),
-					PreferenceConstants.getBoolean(PreferenceConstants.PROBLEM_OVERLAYS),
+					PreferenceConstants.getBoolean(PreferenceConstants.ERROR_OVERLAYS),
+					PreferenceConstants.getBoolean(PreferenceConstants.WARNING_OVERLAYS),
 					PreferenceConstants.getBoolean(PreferenceConstants.JAVA_TYPE_ICONS));
 		}
 	}

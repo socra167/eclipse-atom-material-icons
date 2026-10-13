@@ -2,18 +2,23 @@ package io.github.socra167.atommaterialicons.uitests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.junit.jupiter.api.AfterEach;
@@ -23,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import io.github.socra167.atommaterialicons.Activator;
 import io.github.socra167.atommaterialicons.preferences.MaterialIconsPreferencePage;
 import io.github.socra167.atommaterialicons.preferences.PreferenceConstants;
+import io.github.socra167.atommaterialicons.preferences.PreferenceInitializer;
 
 class PreferencePageTest {
 
@@ -48,11 +54,42 @@ class PreferencePageTest {
 	@Test
 	void showsAllOptionsWithTheirDefaults() {
 		List<Button> checkboxes = checkboxes(shell);
-		assertEquals(6 + PreferenceConstants.ICON_PACKS.size(), checkboxes.size());
+		assertEquals(7 + PreferenceConstants.ICON_PACKS.size(), checkboxes.size());
 		assertTrue(checkbox("Show &file icons").getSelection());
 		assertFalse(checkbox("Also replace the icons of &Java packages and source folders").getSelection());
 		assertFalse(checkbox("Angular (AngularJS)").getSelection());
 		assertTrue(checkbox("Redux").getSelection());
+	}
+
+	@Test
+	void groupsTheErrorAndWarningOptions() {
+		Button error = checkbox("Show the &error overlay");
+		Button warning = checkbox("Show the &warning overlay");
+		assertTrue(error.getSelection());
+		assertTrue(warning.getSelection());
+		assertTrue(error.getParent() instanceof Group group && "Errors and warnings".equals(group.getText()));
+		assertSame(error.getParent(), warning.getParent());
+		assertNotSame(error.getParent(), checkbox("Show &file icons").getParent());
+	}
+
+	@Test
+	void storesErrorAndWarningOptionsSeparately() {
+		Button warning = checkbox("Show the &warning overlay");
+		warning.setSelection(false);
+		warning.notifyListeners(SWT.Selection, null);
+		assertTrue(page.performOk());
+		assertTrue(PreferenceConstants.getBoolean(PreferenceConstants.ERROR_OVERLAYS));
+		assertFalse(PreferenceConstants.getBoolean(PreferenceConstants.WARNING_OVERLAYS));
+	}
+
+	@Test
+	void migratesTheFormerCombinedOption() {
+		IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+		preferences.putBoolean("problemOverlays", false);
+		new PreferenceInitializer().initializeDefaultPreferences();
+		assertNull(preferences.get("problemOverlays", null));
+		assertFalse(PreferenceConstants.getBoolean(PreferenceConstants.ERROR_OVERLAYS));
+		assertFalse(PreferenceConstants.getBoolean(PreferenceConstants.WARNING_OVERLAYS));
 	}
 
 	@Test

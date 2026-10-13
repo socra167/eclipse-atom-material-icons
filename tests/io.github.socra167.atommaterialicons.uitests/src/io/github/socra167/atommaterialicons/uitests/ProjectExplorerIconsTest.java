@@ -16,6 +16,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -54,7 +55,10 @@ class ProjectExplorerIconsTest {
 
 	@AfterEach
 	void tearDown() throws CoreException {
-		InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).remove(PreferenceConstants.FILE_ICONS);
+		IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+		preferences.remove(PreferenceConstants.FILE_ICONS);
+		preferences.remove(PreferenceConstants.ERROR_OVERLAYS);
+		preferences.remove(PreferenceConstants.WARNING_OVERLAYS);
 		project.delete(true, true, null);
 	}
 
@@ -82,7 +86,10 @@ class ProjectExplorerIconsTest {
 		processEvents();
 		assertFalse(sameImage(imageOf(explorer, pom), "icons/files/maven.png"), "file icons should be turned off");
 
-		InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).remove(PreferenceConstants.FILE_ICONS);
+		IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+		preferences.remove(PreferenceConstants.FILE_ICONS);
+		preferences.remove(PreferenceConstants.ERROR_OVERLAYS);
+		preferences.remove(PreferenceConstants.WARNING_OVERLAYS);
 		processEvents();
 		assertShows(explorer, "icons/files/maven.png", pom);
 	}
@@ -106,6 +113,54 @@ class ProjectExplorerIconsTest {
 		processEvents();
 		assertShows(explorer, "icons/files/java.png", java);
 		assertShows(explorer, "icons/folders/src.png", project.getFolder("src"));
+	}
+
+	@Test
+	void errorAndWarningOverlaysCanBeTurnedOffSeparately() throws CoreException {
+		IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+		IFile java = project.getFile("src/Foo.java");
+		IFile pom = project.getFile("pom.xml");
+		IMarker error = java.createMarker(IMarker.PROBLEM);
+		error.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+		IMarker warning = java.createMarker(IMarker.PROBLEM);
+		warning.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+		pom.createMarker(IMarker.PROBLEM).setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+		processEvents();
+		assertTrue(redPixelsInBottomLeft(imageOf(explorer, java).getImageData()) > 10, "error overlay");
+		assertTrue(yellowPixelsInBottomLeft(imageOf(explorer, pom).getImageData()) > 5, "warning overlay");
+
+		// without error overlays, a file with errors and warnings shows the warning
+		preferences.putBoolean(PreferenceConstants.ERROR_OVERLAYS, false);
+		processEvents();
+		ImageData javaImage = imageOf(explorer, java).getImageData();
+		assertTrue(redPixelsInBottomLeft(javaImage) == 0, "no error overlay");
+		assertTrue(yellowPixelsInBottomLeft(javaImage) > 5, "warning overlay instead");
+		error.delete();
+		warning.delete();
+		error = java.createMarker(IMarker.PROBLEM);
+		error.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+		processEvents();
+		assertShows(explorer, "icons/files/java.png", java);
+
+		// without warning overlays
+		preferences.putBoolean(PreferenceConstants.ERROR_OVERLAYS, true);
+		preferences.putBoolean(PreferenceConstants.WARNING_OVERLAYS, false);
+		processEvents();
+		assertTrue(redPixelsInBottomLeft(imageOf(explorer, java).getImageData()) > 10, "error overlay");
+		assertShows(explorer, "icons/files/maven.png", pom);
+	}
+
+	private static int yellowPixelsInBottomLeft(ImageData image) {
+		int count = 0;
+		for (int x = 0; x < 7; x++) {
+			for (int y = image.height - 8; y < image.height; y++) {
+				RGB rgb = image.palette.getRGB(image.getPixel(x, y));
+				if (image.getAlpha(x, y) > 0 && rgb.red > 180 && rgb.green > 120 && rgb.blue < 110) {
+					count++;
+				}
+			}
+		}
+		return count;
 	}
 
 	private static int redPixelsInBottomLeft(ImageData image) {

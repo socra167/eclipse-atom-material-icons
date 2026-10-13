@@ -23,7 +23,8 @@ Material Design icons chosen by file name, extension and folder name.
   - toggle file icons, folder icons and the generic Material folder icon,
   - optionally replace the icons of Java packages and source folders as well,
   - toggle the Java type icons,
-  - toggle problem overlays,
+  - show or hide the error overlay and the warning overlay separately
+    (when only warnings are shown, files with errors and warnings show the warning overlay),
   - enable or disable the optional icon packs (Angular, NestJS, Redux, Rails, test files, ...).
 - The icons can also be switched off per view via *Project Explorer › ⋮ › Customize View… › Content ›
   Atom Material Icons*.
@@ -106,7 +107,8 @@ IntelliJ용 **Atom Material Icons** 플러그인을 Eclipse로 옮긴 확장입�
 - JDT의 *Java Type Indicator*(인터페이스 `I`, 추상 클래스 `A` 배지)는 타입 아이콘과 중복되므로
   *General › Appearance › Label Decorations*에서 끄는 것을 권장합니다.
 - 설정: *Window › Preferences › General › Appearance › Atom Material Icons*에서 파일/폴더 아이콘,
-  Java 타입 아이콘, Java 패키지 아이콘 교체, 오류 오버레이, 아이콘 팩을 켜고 끌 수 있습니다.
+  Java 타입 아이콘, Java 패키지 아이콘 교체, 아이콘 팩을 켜고 끌 수 있고, *오류 및 경고* 그룹에서
+  오류 오버레이와 경고 오버레이를 따로 설정할 수 있습니다.
 
 ## License
 

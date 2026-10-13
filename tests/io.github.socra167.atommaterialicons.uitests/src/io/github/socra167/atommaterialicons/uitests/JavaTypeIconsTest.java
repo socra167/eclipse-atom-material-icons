@@ -53,7 +53,8 @@ class JavaTypeIconsTest {
 	@BeforeEach
 	void setUp() throws CoreException, PartInitException {
 		// the project has no JRE, so the build reports errors; compare the icons without overlays
-		InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).putBoolean(PreferenceConstants.PROBLEM_OVERLAYS, false);
+		InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).putBoolean(PreferenceConstants.ERROR_OVERLAYS, false);
+		InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).putBoolean(PreferenceConstants.WARNING_OVERLAYS, false);
 		IDecoratorManager decorators = PlatformUI.getWorkbench().getDecoratorManager();
 		typeIndicatorEnabled = decorators.getEnabled(TYPE_INDICATOR);
 		decorators.setEnabled(TYPE_INDICATOR, false);
@@ -96,7 +97,8 @@ class JavaTypeIconsTest {
 	void tearDown() throws CoreException {
 		PlatformUI.getWorkbench().getDecoratorManager().setEnabled(TYPE_INDICATOR, typeIndicatorEnabled);
 		InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).remove(PreferenceConstants.JAVA_TYPE_ICONS);
-		InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).remove(PreferenceConstants.PROBLEM_OVERLAYS);
+		InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).remove(PreferenceConstants.ERROR_OVERLAYS);
+		InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).remove(PreferenceConstants.WARNING_OVERLAYS);
 		project.delete(true, true, null);
 	}
 

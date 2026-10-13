@@ -26,8 +26,14 @@ public final class PreferenceConstants {
 	/** Show the type declared in Java source files (class, interface, enum, ...), requires JDT. */
 	public static final String JAVA_TYPE_ICONS = "javaTypeIcons"; //$NON-NLS-1$
 
-	/** Paint error and warning overlays on the icons. */
-	public static final String PROBLEM_OVERLAYS = "problemOverlays"; //$NON-NLS-1$
+	/** Paint the error overlay on the icons of resources with errors. */
+	public static final String ERROR_OVERLAYS = "errorOverlays"; //$NON-NLS-1$
+
+	/** Paint the warning overlay on the icons of resources with warnings. */
+	public static final String WARNING_OVERLAYS = "warningOverlays"; //$NON-NLS-1$
+
+	/** Former single switch for both overlays, migrated to {@link #ERROR_OVERLAYS} and {@link #WARNING_OVERLAYS}. */
+	static final String LEGACY_PROBLEM_OVERLAYS = "problemOverlays"; //$NON-NLS-1$
 
 	/** Prefix of the keys that enable an icon pack, followed by the pack name. */
 	public static final String PACK_PREFIX = "iconPack."; //$NON-NLS-1$
