@@ -44,12 +44,16 @@ Material Design icons chosen by file name, extension and folder name.
 
 ## Installation
 
-1. Build the update site (see below) or download the `atom-material-icons-update-site` artifact
-   of the latest successful [GitHub Actions build](../../actions/workflows/build.yml) and unzip it.
-2. In Eclipse open *Help › Install New Software… › Add… › Local…* and select the
-   `releng/io.github.socra167.atommaterialicons.site/target/repository` folder
-   (or the unzipped artifact).
+1. In Eclipse open *Help › Install New Software…*.
+2. Paste the update site address into *Work with* and press Enter:
+   ```
+   https://socra167.github.io/eclipse-atom-material-icons/
+   ```
 3. Select **Atom Material Icons**, finish the wizard and restart Eclipse.
+
+Installed copies receive new versions through *Help › Check for Updates*. Each release also
+attaches the zipped update site to its [GitHub release](../../releases); it can be installed
+offline with *Install New Software… › Add… › Archive…*.
 
 ## Building
 
@@ -69,6 +73,9 @@ Java 17+. The UI tests open a real workbench, so on a headless Linux machine run
 | `features/io.github.socra167.atommaterialicons.feature` | Installable feature |
 | `releng/io.github.socra167.atommaterialicons.site` | p2 update site |
 | `tools/icon-generator` | Converts the upstream SVG icons and associations |
+
+Releases are published by pushing a version tag, see [docs/RELEASING.md](docs/RELEASING.md).
+The Eclipse Marketplace listing data is in [docs/MARKETPLACE.md](docs/MARKETPLACE.md).
 
 ## Updating the icons
 
@@ -100,7 +107,9 @@ result as usual.
 IntelliJ용 **Atom Material Icons** 플러그인을 Eclipse로 옮긴 확장입니다. Project Explorer에서
 파일 확장자, 파일 이름, 폴더 이름에 따라 Material Design 아이콘을 보여 줍니다.
 
-- 설치: 위 *Installation* 절차대로 빌드된 업데이트 사이트를 *Help › Install New Software…*에서 추가합니다.
+- 설치: *Help › Install New Software…*의 *Work with*에 `https://socra167.github.io/eclipse-atom-material-icons/`를 입력합니다.
+- 릴리스: `v1.0.0` 같은 태그를 푸시하면 GitHub Pages 업데이트 사이트와 GitHub Release가 자동으로 만들어집니다
+  ([docs/RELEASING.md](docs/RELEASING.md)). Marketplace 등록 정보는 [docs/MARKETPLACE.md](docs/MARKETPLACE.md)에 있습니다.
 - Java 파일은 IntelliJ처럼 선언된 타입(클래스, 추상 클래스, 인터페이스, enum, record, 어노테이션,
   예외, 테스트 클래스)에 따라 다른 아이콘으로 표시됩니다. JDT가 설치되어 있어야 합니다.
 - 오류/경고는 Eclipse 기본 오버레이를 쓰되, 아이콘 위에서 잘 보이도록 주변을 투명하게 비워 표시합니다.
