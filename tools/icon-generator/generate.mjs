@@ -7,7 +7,10 @@
  *   - renders the referenced SVG to <name>.png (16x16) and <name>@2x.png (32x32),
  *   - writes a compact association XML that the plug-in reads at runtime.
  *
- * Usage: node generate.mjs <path-to-iconGenerator-checkout> [<plugin-dir>]
+ * With --java it also renders the Java type icons (class, interface, enum, ...) from a
+ * checkout of the Atom Material Icons plug-in (https://github.com/mallowigi/a-file-icon-idea).
+ *
+ * Usage: node generate.mjs <path-to-iconGenerator-checkout> [--java <path-to-a-file-icon-idea-checkout>] [<plugin-dir>]
  */
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
@@ -16,14 +19,37 @@ import { execFileSync } from 'node:child_process';
 import { Resvg } from '@resvg/resvg-js';
 import { XMLParser } from 'fast-xml-parser';
 
+const USAGE = 'Usage: node generate.mjs <path-to-iconGenerator-checkout> [--java <path-to-a-file-icon-idea-checkout>] [<plugin-dir>]';
+
 const here = dirname(fileURLToPath(import.meta.url));
-const source = process.argv[2];
-const pluginDir = resolve(process.argv[3] ?? join(here, '../../bundles/io.github.socra167.atommaterialicons'));
+const args = process.argv.slice(2);
+let javaSource;
+const javaIndex = args.indexOf('--java');
+if (javaIndex >= 0) {
+  javaSource = args[javaIndex + 1];
+  args.splice(javaIndex, 2);
+}
+const source = args[0];
+const pluginDir = resolve(args[1] ?? join(here, '../../bundles/io.github.socra167.atommaterialicons'));
 
 if (!source || !existsSync(join(source, 'icon_associations.xml'))) {
-  console.error('Usage: node generate.mjs <path-to-iconGenerator-checkout> [<plugin-dir>]');
+  console.error(USAGE);
   process.exit(1);
 }
+
+/** Java type icons, by the name the plug-in uses, taken from the glyphs of the IntelliJ plug-in. */
+const JAVA_GLYPHS = 'common/src/main/resources/glyphs/nodes';
+const JAVA_ICONS = [
+  'class',
+  'abstractClass',
+  'interface',
+  'enum',
+  'record',
+  'annotationtype',
+  'exceptionClass',
+  'abstractException',
+  'test',
+];
 
 /** Upstream revision recorded in the generated XML, when the source is a git checkout. */
 let revision = 'unknown';
@@ -165,5 +191,24 @@ function generate(kind, xmlFile, svgDir) {
   }
 }
 
+function generateJavaIcons() {
+  const svgDir = join(javaSource, JAVA_GLYPHS);
+  if (!existsSync(svgDir)) {
+    console.error(`No Java glyphs in ${svgDir}`);
+    console.error(USAGE);
+    process.exit(1);
+  }
+  const outDir = join(pluginDir, 'icons', 'java');
+  rmSync(outDir, { recursive: true, force: true });
+  mkdirSync(outDir, { recursive: true });
+  for (const name of JAVA_ICONS) {
+    render(join(svgDir, `${name}.svg`), outDir, name);
+  }
+  console.log(`java: ${JAVA_ICONS.length} icons`);
+}
+
 generate('files', 'icon_associations.xml', join(source, 'assets/icons/files'));
 generate('folders', 'folder_associations.xml', join(source, 'assets/icons/folders'));
+if (javaSource) {
+  generateJavaIcons();
+}
