@@ -58,12 +58,14 @@ offline with *Install New Software… › Add… › Archive…*.
 ## Building
 
 ```sh
-mvn clean verify
+./mvnw clean verify          # Windows: mvnw.cmd clean verify
 ```
 
-The build uses [Eclipse Tycho](https://github.com/eclipse-tycho/tycho) and needs Maven 3.9 and
-Java 17+. The UI tests open a real workbench, so on a headless Linux machine run them with
-`xvfb-run mvn clean verify`.
+The build uses [Eclipse Tycho](https://github.com/eclipse-tycho/tycho) and needs Java 17+. The UI tests open a real workbench, so on a headless Linux machine run them with
+`xvfb-run ./mvnw clean verify`.
+
+Use the Maven Wrapper (`mvnw`): it pins Maven 3.9.11. Tycho 4 does not work with Maven 4, which
+fails early with `No implementation for MavenTargetLocationFactory was bound`.
 
 | Module | Content |
 | --- | --- |
