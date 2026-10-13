@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Atom Material Icons for Eclipse</title>
+  <style>
+    :root { --bg: #ffffff; --fg: #1f2328; --muted: #59636e; --border: #d1d9e0; --code: #f6f8fa; --accent: #0969da; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #0d1117; --fg: #e6edf3; --muted: #9198a1; --border: #3d444d; --code: #151b23; --accent: #4493f8; }
+    }
+    body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    main { max-width: 720px; margin: 0 auto; padding: 48px 16px; }
+    h1 { font-size: 1.75rem; margin: 0 0 4px; }
+    .version { color: var(--muted); margin: 0 0 32px; }
+    code, .url { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .url { display: block; padding: 12px 16px; background: var(--code); border: 1px solid var(--border); border-radius: 6px; overflow-wrap: anywhere; }
+    ol { padding-left: 1.25rem; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    footer { margin-top: 40px; color: var(--muted); font-size: 0.875rem; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Atom Material Icons for Eclipse</h1>
+  <p class="version">Eclipse update site &middot; version @VERSION@</p>
+
+  <p>Material Design file and folder icons for the Project Explorer, ported from the Atom Material Icons plug-in for IntelliJ.</p>
+
+  <h2>Install</h2>
+  <ol>
+    <li>In Eclipse, open <strong>Help › Install New Software…</strong></li>
+    <li>Paste this address into <strong>Work with</strong> and press Enter:
+      <span class="url" id="site-url">https://socra167.github.io/eclipse-atom-material-icons/</span>
+    </li>
+    <li>Select <strong>Atom Material Icons</strong>, finish the wizard and restart Eclipse.</li>
+  </ol>
+  <p>Requires Eclipse 2024-03 or newer and Java 17.</p>
+
+  <footer>
+    Source, documentation and license: <a href="https://github.com/socra167/eclipse-atom-material-icons">github.com/socra167/eclipse-atom-material-icons</a>
+  </footer>
+</main>
+<script>
+  // show the address this page is actually served from
+  document.getElementById('site-url').textContent = location.href.replace(/index\.html$/, '');
+</script>
+</body>
+</html>

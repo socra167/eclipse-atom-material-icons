@@ -1,0 +1,112 @@
+name: Release
+
+# Builds a release when a version tag such as v1.0.0 is pushed, publishes the
+# update site to GitHub Pages and attaches the zipped update site to a GitHub release.
+# It can also be started by hand to republish the update site.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to build, for example 1.0.0
+        required: true
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+
+      - name: Determine version
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="$INPUT_VERSION"
+          fi
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::'$VERSION' is not a version like 1.2.3"
+            exit 1
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Set version
+        run: |
+          TYCHO_VERSION=$(sed -n 's:.*<tycho.version>\(.*\)</tycho.version>.*:\1:p' pom.xml)
+          mvn -B -ntp "org.eclipse.tycho:tycho-versions-plugin:${TYCHO_VERSION}:set-version" -DnewVersion="$VERSION"
+
+      - name: Prepare signing key
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        run: |
+          if [ -n "$GPG_PRIVATE_KEY" ]; then
+            printf '%s\n' "$GPG_PRIVATE_KEY" > "$RUNNER_TEMP/signing-key.asc"
+            echo "SIGN_ARGS=-Psign -Dtycho.pgp.signer.bc.secretKeys=$RUNNER_TEMP/signing-key.asc" >> "$GITHUB_ENV"
+          else
+            echo "::warning::No GPG_PRIVATE_KEY secret, the update site is not signed"
+          fi
+
+      - name: Build and test
+        env:
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: xvfb-run -a mvn -B -ntp clean verify $SIGN_ARGS
+
+      - name: Remove signing key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/signing-key.asc"
+
+      - name: Prepare update site
+        run: |
+          SITE=releng/io.github.socra167.atommaterialicons.site
+          mkdir -p _site
+          cp -r "$SITE/target/repository/." _site/
+          sed "s/@VERSION@/$VERSION/g" "$SITE/pages/index.html" > _site/index.html
+          cp "$SITE"/target/io.github.socra167.atommaterialicons.site-*.zip "atom-material-icons-$VERSION.zip"
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Create GitHub release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Atom Material Icons ${{ env.VERSION }}
+          generate_release_notes: true
+          files: atom-material-icons-${{ env.VERSION }}.zip
+
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: tests/*/target/surefire-reports/
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
