@@ -8,6 +8,7 @@ import java.io.ByteArrayInputStream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -15,6 +16,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
@@ -89,6 +91,40 @@ class ProjectExplorerIconsTest {
 		InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).remove(PreferenceConstants.FILE_ICONS);
 		processEvents();
 		assertShows("icons/files/maven.png", pom);
+	}
+
+	@Test
+	void showsTheErrorOverlayOnFilesAndTheirFolders() throws CoreException {
+		IFile java = project.getFile("src/Foo.java");
+		IMarker marker = java.createMarker(IMarker.PROBLEM);
+		marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+		processEvents();
+
+		for (IResource resource : new IResource[] { java, project.getFolder("src") }) {
+			ImageData image = imageOf(resource).getImageData();
+			assertTrue(redPixelsInBottomLeft(image) > 10, resource + " should show the error overlay");
+			assertTrue(image.getAlpha(7, image.height - 8) == 0 || image.getAlpha(8, image.height - 9) == 0,
+					resource + " should have a transparent margin around the overlay");
+		}
+		assertShows("icons/files/maven.png", project.getFile("pom.xml"));
+
+		marker.delete();
+		processEvents();
+		assertShows("icons/files/java.png", java);
+		assertShows("icons/folders/src.png", project.getFolder("src"));
+	}
+
+	private static int redPixelsInBottomLeft(ImageData image) {
+		int count = 0;
+		for (int x = 0; x < 7; x++) {
+			for (int y = image.height - 8; y < image.height; y++) {
+				RGB rgb = image.palette.getRGB(image.getPixel(x, y));
+				if (image.getAlpha(x, y) > 0 && rgb.red > 150 && rgb.green < 120 && rgb.blue < 120) {
+					count++;
+				}
+			}
+		}
+		return count;
 	}
 
 	private void assertShows(String icon, IResource resource) {

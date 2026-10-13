@@ -18,8 +18,6 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
-import org.eclipse.jface.viewers.DecorationOverlayIcon;
-import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.eclipse.swt.graphics.Image;
@@ -136,7 +134,7 @@ public class MaterialIconLabelProvider extends LabelProvider
 			return descriptor;
 		}
 		ImageDescriptor overlayDescriptor = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(overlay);
-		return new DecorationOverlayIcon(descriptor, overlayDescriptor, IDecoration.BOTTOM_LEFT);
+		return new ProblemOverlayIcon(descriptor, overlayDescriptor);
 	}
 
 	private LocalResourceManager getResources() {
