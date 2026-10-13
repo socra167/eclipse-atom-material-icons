@@ -21,7 +21,10 @@ exact, copy-pasteable steps.
 Find, rather than assume:
 
 - Tycho version (`<tycho.version>` in the parent `pom.xml`) and the build command that works today
-  (`mvn clean verify`, with `xvfb-run -a` on Linux if UI tests exist).
+  (`./mvnw clean verify`, with `xvfb-run -a` on Linux if UI tests exist).
+- Whether a Maven Wrapper (`mvnw`, `.mvn/wrapper/`) exists. If not, add one pinned to Maven 3.9.x
+  before writing any workflow (see below) — CI images may ship Maven 4 as `mvn`, and Tycho 4 fails
+  under it.
 - The `eclipse-repository` module (has `category.xml`) — its `target/repository` is the update site.
 - The feature ID (`feature.xml` `id=`) — the Marketplace needs it, without `.feature.group`.
 - Current versions (`1.0.0-SNAPSHOT` in poms, `1.0.0.qualifier` in MANIFEST/feature.xml).
@@ -32,14 +35,29 @@ Find, rather than assume:
 If the project is not built with Tycho, the same ideas apply but the templates need adapting;
 say so rather than forcing them.
 
-## 1. Version releases from git tags
+## 1. Pin Maven with the wrapper
+
+GitHub's runner images started shipping Maven 4 as the default `mvn`. Tycho 4.0.x only runs on
+Maven 3.9, and under Maven 4 the build dies before compiling anything with
+`No implementation for MavenTargetLocationFactory was bound` (the log also shows
+`Loaded … auto-discovered prefixes`, a Maven 4 message). Pin the version so local and CI builds
+use the same Maven:
+
+```sh
+mvn -N org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper -Dmaven=3.9.11 -Dtype=only-script
+```
+
+Commit `mvnw`, `mvnw.cmd` and `.mvn/wrapper/maven-wrapper.properties`, and call `./mvnw` in every
+workflow step and in the docs.
+
+## 2. Version releases from git tags
 
 Keep `-SNAPSHOT`/`.qualifier` in the source tree and let the release job stamp the exact version
 from the tag. This avoids "bump version" commits and guarantees the published version matches the
 tag:
 
 ```sh
-mvn -B -ntp org.eclipse.tycho:tycho-versions-plugin:<tycho.version>:set-version -DnewVersion=1.2.3
+./mvnw -B -ntp org.eclipse.tycho:tycho-versions-plugin:<tycho.version>:set-version -DnewVersion=1.2.3
 ```
 
 It rewrites every pom, MANIFEST.MF and feature.xml (`1.2.3.qualifier` → `1.2.3`). Verify on the
@@ -47,7 +65,7 @@ real project once (`git diff --stat`, then `git checkout .`).
 
 Every release must be higher than the previous one, or p2 will not offer it as an update.
 
-## 2. Optional PGP signing
+## 3. Optional PGP signing
 
 Unsigned content makes Eclipse warn during install. Signing is optional but recommended. Add the
 profile from `assets/sign-profile.xml` to the **`eclipse-repository` module's pom** (not the parent —
@@ -56,7 +74,7 @@ the goal signs an assembled repository and fails elsewhere with "No repository f
 It uses the Bouncy Castle signer, so CI needs no gpg install or agent:
 
 ```sh
-MAVEN_GPG_PASSPHRASE=... mvn clean verify -Psign -Dtycho.pgp.signer.bc.secretKeys=/path/key.asc
+MAVEN_GPG_PASSPHRASE=... ./mvnw clean verify -Psign -Dtycho.pgp.signer.bc.secretKeys=/path/key.asc
 ```
 
 Read `references/pitfalls.md` before touching signing — the `bc` signer silently falls back to the
@@ -65,7 +83,7 @@ gpg executable unless the key is given as a *file*, which cost real debugging ti
 Verify locally with a throwaway key (recipe in `references/verification.md`): build with `-Psign`,
 check `pgp.signatures` exists in `artifacts.xml`, and `gpg --verify` one artifact.
 
-## 3. Release workflow
+## 4. Release workflow
 
 Copy `assets/release.yml` to `.github/workflows/release.yml` and fill in the placeholders
 (`@SITE_MODULE@` = path of the eclipse-repository module, `@SITE_ARTIFACT@` = its artifactId,
@@ -91,7 +109,7 @@ the repo). Check the output folder contains `content.jar`/`artifacts.jar`, `plug
 `features/` with exact versions, `index.html` with the version substituted, and the zip. The real
 Pages deploy only runs on GitHub — say so.
 
-## 4. Documentation and listing material
+## 5. Documentation and listing material
 
 Write, from the templates in `assets/`:
 
@@ -103,7 +121,7 @@ Write, from the templates in `assets/`:
 - A logo (the Marketplace shows one). Make it from the project's own assets; don't reuse another
   project's logo even when its icons are licensed for reuse — a logo identifies a project.
 
-## 5. Hand over the manual steps
+## 6. Hand over the manual steps
 
 End with a short, ordered checklist of what only the user can do:
 

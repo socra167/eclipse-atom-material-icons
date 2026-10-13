@@ -54,7 +54,7 @@ jobs:
       - name: Set version
         run: |
           TYCHO_VERSION=$(sed -n 's:.*<tycho.version>\(.*\)</tycho.version>.*:\1:p' pom.xml)
-          mvn -B -ntp "org.eclipse.tycho:tycho-versions-plugin:${TYCHO_VERSION}:set-version" -DnewVersion="$VERSION"
+          ./mvnw -B -ntp "org.eclipse.tycho:tycho-versions-plugin:${TYCHO_VERSION}:set-version" -DnewVersion="$VERSION"
 
       - name: Prepare signing key
         env:
@@ -70,7 +70,7 @@ jobs:
       - name: Build and test
         env:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-        run: xvfb-run -a mvn -B -ntp clean verify $SIGN_ARGS   # drop xvfb-run if there are no UI tests
+        run: xvfb-run -a ./mvnw -B -ntp clean verify $SIGN_ARGS   # drop xvfb-run if there are no UI tests
 
       - name: Remove signing key
         if: always()

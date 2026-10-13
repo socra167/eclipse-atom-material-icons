@@ -1,5 +1,17 @@
 # Pitfalls found while doing this for real
 
+## Maven 4 on CI runners
+
+- GitHub-hosted Ubuntu images moved their default `mvn` to Maven 4. Tycho 4.0.x then fails at
+  startup with `No implementation for MavenTargetLocationFactory was bound` (plus warnings
+  `Error injecting: org.eclipse.tycho.p2resolver.DefaultTargetPlatformFactory`). The log line
+  `Loaded … auto-discovered prefixes for remote repository central` identifies Maven 4.
+  It is not a Java version problem: the same build passes on Java 17 and 21 with Maven 3.9.
+- Fix: commit a Maven Wrapper pinned to 3.9.x and use `./mvnw` everywhere. `setup-java` does not
+  choose the Maven version.
+- To reproduce locally, download the Maven 4 binary distribution from Maven Central and run the
+  build with it.
+
 ## Signing (tycho-gpg-plugin `sign-p2-artifacts`)
 
 - **Put the profile in the `eclipse-repository` module**, not the parent pom. In the parent it runs

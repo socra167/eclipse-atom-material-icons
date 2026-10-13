@@ -90,7 +90,7 @@ def main():
             if not has_xvfb:
                 script = script.replace("xvfb-run -a ", "")
             if args.skip_tests:
-                script = re.sub(r"(mvn\b[^\n]*\bverify\b)", r"\1 -DskipTests", script)
+                script = re.sub(r"(mvnw?\b[^\n]*\bverify\b)", r"\1 -DskipTests", script)
             step_env = dict(env)
             for key, value in (step.get("env") or {}).items():
                 step_env[key] = expand(value, version)

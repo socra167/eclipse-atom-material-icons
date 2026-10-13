@@ -6,7 +6,7 @@ rm -rf "$GNUPGHOME" && mkdir -m 700 "$GNUPGHOME"
 gpg -q --batch --passphrase testpass --quick-gen-key "Test Signer <test@example.invalid>" ed25519 sign never
 gpg --batch --pinentry-mode loopback --passphrase testpass --armor --export-secret-keys > /tmp/test-key.asc
 
-MAVEN_GPG_PASSPHRASE=testpass mvn -B clean verify -Psign -DskipTests \
+MAVEN_GPG_PASSPHRASE=testpass ./mvnw -B clean verify -Psign -DskipTests \
   -Dtycho.pgp.signer.bc.secretKeys=/tmp/test-key.asc
 
 # signatures and public key are recorded in the artifact repository
