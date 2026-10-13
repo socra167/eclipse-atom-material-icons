@@ -13,4 +13,37 @@
 
   <artifactId>io.github.socra167.atommaterialicons.site</artifactId>
   <packaging>eclipse-repository</packaging>
+
+  <profiles>
+    <!--
+      Signs the plug-in and feature with PGP so Eclipse can show who published them.
+      Activate with -Psign and provide the armored secret key in the
+      file named by -Dtycho.pgp.signer.bc.secretKeys=<path> and its passphrase in the
+      MAVEN_GPG_PASSPHRASE environment variable.
+    -->
+    <profile>
+      <id>sign</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.eclipse.tycho</groupId>
+            <artifactId>tycho-gpg-plugin</artifactId>
+            <version>${tycho.version}</version>
+            <executions>
+              <execution>
+                <id>pgpsigner</id>
+                <goals>
+                  <goal>sign-p2-artifacts</goal>
+                </goals>
+                <configuration>
+                  <signer>bc</signer>
+                  <addPublicKeyToRepo>true</addPublicKeyToRepo>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
