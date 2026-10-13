@@ -13,7 +13,11 @@ release, so installed copies find new versions with *Help › Check for Updates*
 ## One-time setup
 
 1. **Enable GitHub Pages**: *Settings › Pages › Build and deployment › Source* → **GitHub Actions**.
-2. **Optional: PGP signing.** Without it Eclipse warns about unsigned content during installation.
+2. **Allow tags to deploy**: *Settings › Environments › github-pages › Deployment branches and tags*
+   → *Add deployment branch or tag rule* → type **Tag**, pattern `v*`. The `github-pages` environment
+   only allows the default branch by default, so a release started by a tag fails in the `deploy`
+   job within a second, without logs.
+3. **Optional: PGP signing.** Without it Eclipse warns about unsigned content during installation.
    1. Create a key that is only used for signing releases:
       ```sh
       gpg --quick-gen-key "@DISPLAY_NAME@ <you@example.com>" ed25519 sign 3y
@@ -39,6 +43,9 @@ release, so installed copies find new versions with *Help › Check for Updates*
 
 Each release must have a higher version than the previous one, otherwise Eclipse does not offer it
 as an update. Use semantic versioning: `1.0.1` for fixes, `1.1.0` for new features.
+
+If only the `deploy` job failed (for example before the setup above was done), open the run and use
+*Re-run failed jobs*; the built site is reused.
 
 To republish the update site without a new tag, run the Release workflow by hand
 (*Actions › Release › Run workflow*) and enter the version.

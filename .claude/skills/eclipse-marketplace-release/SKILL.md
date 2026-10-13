@@ -127,12 +127,15 @@ End with a short, ordered checklist of what only the user can do:
 
 1. GitHub *Settings › Pages › Source* → **GitHub Actions** (the deploy job fails until this is set;
    the default `GITHUB_TOKEN` cannot enable Pages).
-2. Optional: create a signing key and add `GPG_PRIVATE_KEY` / `GPG_PASSPHRASE` secrets.
-3. `git tag vX.Y.Z && git push origin vX.Y.Z`, watch the Release run, open the Pages URL, install
+2. *Settings › Environments › github-pages › Deployment branches and tags*: add a **tag** rule `v*`.
+   The environment only allows the default branch by default, so tag-triggered deploys fail
+   instantly (no logs) until this rule exists. Then *Re-run failed jobs* on the Release run.
+3. Optional: create a signing key and add `GPG_PRIVATE_KEY` / `GPG_PASSPHRASE` secrets.
+4. `git tag vX.Y.Z && git push origin vX.Y.Z`, watch the Release run, open the Pages URL, install
    from it in a real Eclipse.
-4. Log in at marketplace.eclipse.org (Eclipse account from accounts.eclipse.org) → *Add Content*,
+5. Log in at marketplace.eclipse.org (Eclipse account from accounts.eclipse.org) → *Add Content*,
    paste the values from `docs/MARKETPLACE.md`, submit. Listings are reviewed before they appear.
-5. Later releases: just push a higher tag; the listing does not need editing unless the
+6. Later releases: just push a higher tag; the listing does not need editing unless the
    supported Eclipse versions or description change.
 
 Be explicit about what was verified locally and what has not run yet (Pages deploy, release

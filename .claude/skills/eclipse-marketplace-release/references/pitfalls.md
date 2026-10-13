@@ -41,6 +41,11 @@
 
 - The deploy job needs *Settings › Pages › Source = GitHub Actions*. `GITHUB_TOKEN` cannot turn
   Pages on, so this is a manual step for the user.
+- The `github-pages` environment that Pages creates only allows deployments from the default
+  branch. A release workflow triggered by a tag gets a `deploy` job that fails within a second,
+  with no step logs (the logs API returns 404). Fix: *Settings › Environments › github-pages ›
+  Deployment branches and tags* → add a tag rule `v*`, then re-run the failed job. The build job and
+  the GitHub release are unaffected.
 - Workflow permissions needed: `pages: write`, `id-token: write`, and `contents: write` for the
   release.
 - The site root holds the p2 files directly (`content.jar`, `artifacts.jar`, `p2.index`,
