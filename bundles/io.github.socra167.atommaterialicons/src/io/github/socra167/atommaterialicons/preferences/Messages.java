@@ -12,6 +12,7 @@ final class Messages extends NLS {
 	public static String PreferencePage_folderIcons;
 	public static String PreferencePage_defaultFolderIcon;
 	public static String PreferencePage_modelElementFolders;
+	public static String PreferencePage_javaTypeIcons;
 	public static String PreferencePage_problemOverlays;
 	public static String PreferencePage_iconPacksGroup;
 	public static String PreferencePage_pack_ANGULAR;

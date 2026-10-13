@@ -48,7 +48,7 @@ class PreferencePageTest {
 	@Test
 	void showsAllOptionsWithTheirDefaults() {
 		List<Button> checkboxes = checkboxes(shell);
-		assertEquals(5 + PreferenceConstants.ICON_PACKS.size(), checkboxes.size());
+		assertEquals(6 + PreferenceConstants.ICON_PACKS.size(), checkboxes.size());
 		assertTrue(checkbox("Show &file icons").getSelection());
 		assertFalse(checkbox("Also replace the icons of &Java packages and source folders").getSelection());
 		assertFalse(checkbox("Angular (AngularJS)").getSelection());

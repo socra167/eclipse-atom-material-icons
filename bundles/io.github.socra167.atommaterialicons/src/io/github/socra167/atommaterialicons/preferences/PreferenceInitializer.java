@@ -16,7 +16,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		IEclipsePreferences defaults = DefaultScope.INSTANCE.getNode(Activator.PLUGIN_ID);
 		for (String key : new String[] { PreferenceConstants.FILE_ICONS, PreferenceConstants.FOLDER_ICONS,
 				PreferenceConstants.DEFAULT_FOLDER_ICON, PreferenceConstants.MODEL_ELEMENT_FOLDERS,
-				PreferenceConstants.PROBLEM_OVERLAYS }) {
+				PreferenceConstants.JAVA_TYPE_ICONS, PreferenceConstants.PROBLEM_OVERLAYS }) {
 			defaults.putBoolean(key, getDefault(key));
 		}
 		for (String pack : PreferenceConstants.ICON_PACKS) {

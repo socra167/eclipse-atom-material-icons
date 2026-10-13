@@ -12,6 +12,7 @@ Require-Bundle: io.github.socra167.atommaterialicons,
  org.eclipse.ui,
  org.eclipse.ui.navigator,
  org.eclipse.ui.navigator.resources,
- org.eclipse.ui.ide
+ org.eclipse.ui.ide,
+ org.eclipse.jdt.core
 Import-Package: org.junit.jupiter.api;version="[5.0.0,6.0.0)"
 Automatic-Module-Name: io.github.socra167.atommaterialicons.uitests

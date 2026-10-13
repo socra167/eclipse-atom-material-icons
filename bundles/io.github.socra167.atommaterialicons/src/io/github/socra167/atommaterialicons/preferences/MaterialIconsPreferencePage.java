@@ -33,6 +33,7 @@ public class MaterialIconsPreferencePage extends FieldEditorPreferencePage imple
 		addBoolean(PreferenceConstants.FOLDER_ICONS, Messages.PreferencePage_folderIcons, icons);
 		addBoolean(PreferenceConstants.DEFAULT_FOLDER_ICON, Messages.PreferencePage_defaultFolderIcon, icons);
 		addBoolean(PreferenceConstants.MODEL_ELEMENT_FOLDERS, Messages.PreferencePage_modelElementFolders, icons);
+		addBoolean(PreferenceConstants.JAVA_TYPE_ICONS, Messages.PreferencePage_javaTypeIcons, icons);
 		addBoolean(PreferenceConstants.PROBLEM_OVERLAYS, Messages.PreferencePage_problemOverlays, icons);
 
 		Composite packs = createGroup(Messages.PreferencePage_iconPacksGroup);

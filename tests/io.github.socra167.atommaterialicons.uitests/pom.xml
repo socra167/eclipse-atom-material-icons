@@ -31,6 +31,12 @@
               <artifactId>org.eclipse.ui.ide.application</artifactId>
               <version>0.0.0</version>
             </dependency>
+            <dependency>
+              <!-- shows Java projects as Java elements in the Project Explorer -->
+              <type>eclipse-plugin</type>
+              <artifactId>org.eclipse.jdt.ui</artifactId>
+              <version>0.0.0</version>
+            </dependency>
           </dependencies>
         </configuration>
       </plugin>

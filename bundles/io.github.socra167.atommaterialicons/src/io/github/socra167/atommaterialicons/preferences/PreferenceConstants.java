@@ -23,6 +23,9 @@ public final class PreferenceConstants {
 	/** Also replace the icons of folders shown as model elements, such as Java packages and source folders. */
 	public static final String MODEL_ELEMENT_FOLDERS = "modelElementFolders"; //$NON-NLS-1$
 
+	/** Show the type declared in Java source files (class, interface, enum, ...), requires JDT. */
+	public static final String JAVA_TYPE_ICONS = "javaTypeIcons"; //$NON-NLS-1$
+
 	/** Paint error and warning overlays on the icons. */
 	public static final String PROBLEM_OVERLAYS = "problemOverlays"; //$NON-NLS-1$
 
